@@ -36,3 +36,14 @@ impl Serialize for Shaper {
         }
     }
 }
+
+pub trait JSON {
+    fn to_json(&self) -> String
+            where Self: Serialize {
+        return serde_json::to_string(&self).unwrap();
+    }
+}
+
+impl JSON for Shaper {
+    // add code here
+}
