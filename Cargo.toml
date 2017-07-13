@@ -1,0 +1,9 @@
+[package]
+name = "extension_methods"
+version = "0.1.0"
+authors = ["simbo1905 <simbo1905@60hertz.com>"]
+
+[dependencies]
+some_extension = { path = "some_extension" }
+some_library = { path = "some_library" }
+serde_json = "1.0"
