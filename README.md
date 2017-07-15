@@ -1,6 +1,6 @@
 # Rust Extension Methods
 
-An example of using Extention Methods to pimp my library with a json generating method. 
+An example of using Extention Methods to pimp my library with a json generating method. The idea is that you have a clean create with the library code and a seperate create with the extention methods. This avoids having 3rd party marcos like `serde` as a dependency on your clean library code. This the write up at https://simbo1905.wordpress.com/2017/07/12/rust-extension-methods/
 
 This project is a workspace containing two libraries and a binary project. 
 
