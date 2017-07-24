@@ -1,42 +1,40 @@
 
 extern crate serde;
 extern crate serde_json;
+#[macro_use]
+extern crate serde_derive;
 
 extern crate some_library;
 use some_library::Shape;
 
-use serde::ser::{Serialize, Serializer, SerializeStruct};
+use serde::ser::{Serialize};
 
-#[derive(Debug)]
-pub struct Shaper(pub Shape);
-
-impl Serialize for Shaper {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: Serializer
-    {
-        match self.0 {
-            Shape::Circle { x, y, radius } => {
-                // 3 is the number of fields in the struct.
-                let mut state = serializer.serialize_struct("Circle", 3)?;
-                state.serialize_field("x", &x)?;
-                state.serialize_field("y", &y)?;
-                state.serialize_field("r", &radius)?;
-                state.end()
-            }
-                
-            Shape::Rect { x, y, width, height } => {
-                // 4 is the number of fields in the struct.
-                let mut state = serializer.serialize_struct("Rect", 3)?;
-                state.serialize_field("x", &x)?;
-                state.serialize_field("y", &y)?;
-                state.serialize_field("width", &width)?;
-                state.serialize_field("height", &height)?;
-                state.end()
-            }
-        }
-    }
+// This enum is onlu used to generate the Serialize method using serde_derive
+// https://serde.rs/remote-derive.html
+// Serde calls this the definition of the remote type. It is just a copy of the
+// remote type. The `remote` attribute gives the path to the actual type.
+#[derive(Serialize)]
+#[serde(remote = "Shape")]
+pub enum ShapeDef {
+    Circle { x: u32, y: u32, radius: u32},
+    Rect { x: u32, y: u32, width: u32, height: u32}
 }
 
+// This is the "newtype" pattern. It serialises the external 
+// create class using the serializer definition generated for the local type.
+// https://serde.rs/remote-derive.html
+// Now the remote type can be used almost like it had its own Serialize and
+// Deserialize impls all along. The `with` attribute gives the path to the
+// definition for the remote type. Note that the real type of the field is the
+// remote type, not the definition type.
+#[derive(Serialize)]
+#[derive(Debug)]
+pub struct Shaper(
+    #[serde(with = "ShapeDef")]
+    pub Shape
+);
+
+// This is the extention method trait which has a default to_json using serde
 pub trait JSON {
     fn to_json(&self) -> String
             where Self: Serialize {
@@ -44,6 +42,7 @@ pub trait JSON {
     }
 }
 
+// This adds the exention method trait to the newtype pattern object
 impl JSON for Shaper {
     // add code here
 }
